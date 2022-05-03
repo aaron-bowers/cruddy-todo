@@ -15,8 +15,8 @@ const zeroPaddedNumber = (num) => {
   return sprintf('%05d', num);
 };
 
-const readCounter = (callback) => {
-  fs.readFile(exports.counterFile, (err, fileData) => {
+const readCounter = (callback) => { // read the counter of the file
+  fs.readFile(exports.counterFile, (err, fileData) => { // readFile(data, callback)
     if (err) {
       callback(null, 0);
     } else {
@@ -26,7 +26,7 @@ const readCounter = (callback) => {
 };
 
 const writeCounter = (count, callback) => {
-  var counterString = zeroPaddedNumber(count);
+  var counterString = zeroPaddedNumber(count); // convert to a counter string
   fs.writeFile(exports.counterFile, counterString, (err) => {
     if (err) {
       throw ('error writing counter');
@@ -38,12 +38,11 @@ const writeCounter = (count, callback) => {
 
 // Public API - Fix this function //////////////////////////////////////////////
 
-exports.getNextUniqueId = () => {
-  counter = counter + 1;
-  return zeroPaddedNumber(counter);
+exports.getNextUniqueId = (callback) => { // this gives us access to
+  readCounter((err, currentCount) => { // the values within readCounter
+    writeCounter(currentCount + 1, callback);
+  });
 };
-
-
 
 // Configuration -- DO NOT MODIFY //////////////////////////////////////////////
 

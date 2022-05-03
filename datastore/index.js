@@ -8,9 +8,20 @@ var items = {};
 // Public API - Fix these CRUD functions ///////////////////////////////////////
 
 exports.create = (text, callback) => {
-  var id = counter.getNextUniqueId();
-  items[id] = text;
-  callback(null, { id, text });
+  counter.getNextUniqueId((err, uniqueId) => {
+    // create a new todo in its own file
+    // fs.writeFile(file, data, options, callback)
+    // https://nodejs.org/api/fs.html#fswritefilefile-data-options-callback
+    fs.writeFile(path.join(exports.dataDir, `${uniqueId}.txt`), text, (err) => {
+      if (err) {
+        console.error('no file found');
+      } else {
+        // server.js line 22 callback is invoked
+        callback(null, { id: uniqueId, text: text });
+      }
+    });
+  });
+  // items[id] = text;
 };
 
 exports.readAll = (callback) => {
