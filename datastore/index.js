@@ -3,6 +3,9 @@ const path = require('path');
 const _ = require('underscore');
 const counter = require('./counter');
 
+const Promise = require('bluebird');
+const readFilePromise = Promise.promisify(fs.readFile);
+
 // var items = {};
 
 // Public API - Fix these CRUD functions ///////////////////////////////////////
@@ -30,11 +33,17 @@ exports.readAll = (callback) => {
       console.error('game over');
     } else {
       var data = _.map(files, (file) => {
+        // this assigns id to a file name without txt
         let id = path.basename(file, '.txt');
-        return { id: id, text: id };
+        let filepath = path.join(exports.dataDir, file);
+        return readFilePromise(filepath).then((fileData) => {
+          return { id: id, text: fileData.toString() };
+        });
       });
-      // console.log(data);
-      callback(null, data);
+      Promise.all(data)
+        .then((items) => {
+          callback(null, items);
+        });
     }
   });
 };
@@ -86,3 +95,22 @@ exports.initialize = () => {
     fs.mkdirSync(exports.dataDir);
   }
 };
+
+/* create promiseFn and pass in all files as the argument
+  // return a new Promise instance passing in resolve and reject functions
+    // call asyncFn (fs.readdir) passing in all files and err-first callback
+      // then invoke map function passing in files as the list and giving us access to each file
+
+fs.readdir(exports.dataDir, (err, files) => {
+  //   if (err) {
+    //     console.error('game over');
+    //   } else {
+      //     var data = _.map(files, (file) => {
+        //       // this assigns id to a file name without txt
+        //       let id = path.basename(file, '.txt');
+        //        return { id: id, text: id };
+        //     });
+        //     // console.log(data);
+//     callback(null, data);
+//   }
+});*/
