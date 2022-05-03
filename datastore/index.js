@@ -52,13 +52,16 @@ exports.readOne = (id, callback) => {
 };
 
 exports.update = (id, text, callback) => {
-  var item = items[id];
-  if (!item) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    items[id] = text;
-    callback(null, { id, text });
-  }
+  let fileName = id + '.txt';
+  fs.readFile(path.join(exports.dataDir, fileName), 'utf8', (err, todo) => {
+    if (err) {
+      callback(new Error(`Unable to edit ${id} at this time. So sorry. Here's a cookie🍪`));
+    } else {
+      fs.writeFile(path.join(exports.dataDir, fileName), text, 'utf8', (err, todo) => {
+        callback(null, { id: id, text: text });
+      });
+    }
+  });
 };
 
 exports.delete = (id, callback) => {
