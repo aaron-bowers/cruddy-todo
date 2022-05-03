@@ -40,12 +40,15 @@ exports.readAll = (callback) => {
 };
 
 exports.readOne = (id, callback) => {
-  var text = items[id];
-  if (!text) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback(null, { id, text });
-  }
+  // id is a string that we can concatenate on *'.txt'
+  let fileName = id + '.txt';
+  fs.readFile(path.join(exports.dataDir, fileName), 'utf8', (err, todo) => {
+    if (err) {
+      callback(new Error(`No item with id: ${id}`));
+    } else {
+      callback(null, { id: id, text: todo });
+    }
+  });
 };
 
 exports.update = (id, text, callback) => {
